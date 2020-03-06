@@ -9,13 +9,6 @@ Please do not distribute. The code will become public upon acceptance of the pap
 
 main class file for asynchronous multi agent active search
 
-author: anonymous 
-
-(structure is referenced from parallel Thompson Sampling by:
-Kandasamy, K., Krishnamurthy, A., Schneider, J., and
-P´oczos, B. Asynchronous parallel Bayesian optimisation
-via Thompson sampling. arXiv preprint
-arXiv:1705.09236, (2017), GitHub repository: https://github.com/kirthevasank/gp-parallel-ts)
 '''
 
 from SPATS import SPATS
