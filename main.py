@@ -4,7 +4,7 @@ Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Act
 for Sparse Signals with Region Sensing", 
 2020 international conference on machine learning (ICML) (submitted)
 
-(c) Feb 9, 2020: rghods@cs.cmu.edu, arundhat@andrew.cmu.edu
+(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
 Please do not distribute. The code will become public upon acceptance of the paper.
 
 main class file for asynchronous multi agent active search
