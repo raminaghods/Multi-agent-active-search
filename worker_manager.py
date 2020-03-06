@@ -1,9 +1,13 @@
 '''
-code for the submitted work: "Asynchronous Multi Agent Active Search for Sparse Signals with Region Sensing"
+Code for the following publication: 
+Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
+for Sparse Signals with Region Sensing", 
+2020 international conference on machine learning (ICML) (submitted)
+
+(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
+Please do not distribute. The code will become public upon acceptance of the paper.
 
 Manager for multiple agents(workers). function used by main.py
-
-author: anonymous 
 
 (structure is referenced from parallel Thompson Sampling by:
 Kandasamy, K., Krishnamurthy, A., Schneider, J., and
