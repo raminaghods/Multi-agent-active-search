@@ -1,5 +1,11 @@
 '''
-code for the submitted work: "Asynchronous Multi Agent Active Search for Sparse Signals with Region Sensing"
+Code for the following publication: 
+Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
+for Sparse Signals with Region Sensing", 
+2020 international conference on machine learning (ICML) (submitted)
+
+(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
+Please do not distribute. The code will become public upon acceptance of the paper.
 
 In this file, we are coding the RSI algorithm from reference:
 Ma, Y., Garnett, R., and Schneider, J. Active search for
@@ -8,7 +14,6 @@ Conference on Artificial Intelligence, 2017.
 
 We use this code to compare RSI algorithm from the aforementioned reference to our proposed SPATS and LATSI algorithms.
 
-@author: anonymous
 '''
 
 import numpy as np
