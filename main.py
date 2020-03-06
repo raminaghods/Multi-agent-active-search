@@ -1,5 +1,11 @@
 '''
-code for the submitted work: "Asynchronous Multi Agent Active Search for Sparse Signals with Region Sensing"
+Code for the following publication: 
+Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
+for Sparse Signals with Region Sensing", 
+2020 international conference on machine learning (ICML) (submitted)
+
+(c) Feb 9, 2020: rghods@cs.cmu.edu, arundhat@andrew.cmu.edu
+Please do not distribute. The code will become public upon acceptance of the paper.
 
 main class file for asynchronous multi agent active search
 
