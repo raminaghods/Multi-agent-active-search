@@ -120,7 +120,7 @@ class SPATS(object):
         #XT_Y = np.matmul(np.transpose(X),Y)
         #beta_tilde = np.maximum(self.gibbs_invgauss(1000+recv_time,XT_X,XT_Y),np.zeros((self.n,1)))
 
-        return beta_tilde,Sig0,gamma,B,L
+        return beta_hat,Sig0,gamma,beta_tilde,L
 
     def gibbs_invgauss(self,itr,XT_X,XT_Y):
         self.rng = np.random.RandomState(self.trl+itr) #itr includes recv_time, so didn't pass/use that explicitly
@@ -153,7 +153,7 @@ class SPATS(object):
             # gamma = points_dict['gamma']
             # B = points_dict['B']
             L = points_dict['par']
-            beta_tilde,Sig0,gamma,B,L = self.getPosterior(X,Y,L,recv_time)
+            _,Sig0,gamma,beta_tilde,L = self.getPosterior(X,Y,L,recv_time)
         else:#this branch True on initial evaluations for agents with samples from prior
             beta_tilde = self.sample_from_prior_per_worker(recv_time) #points_dict['beta']
             L = self.L
