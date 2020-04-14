@@ -138,7 +138,7 @@ class LATSI(object):
         
 
 
-        return beta_tilde,U,L,pi_0,beta_rsi
+        return beta_hat,U,beta_tilde,pi_0,beta_rsi
     
     def gibbs_invgauss(self,itr,XT_X,XT_Y):
         
@@ -165,23 +165,12 @@ class LATSI(object):
             # gamma = points_dict['gamma']
             # B = points_dict['B']
             L = points_dict['par']
-            beta_tilde,U,L,pi_0,beta_rsi = self.getPosterior(X,Y,L,recv_time)
+            _,U,beta_tilde,pi_0,beta_rsi = self.getPosterior(X,Y,L,recv_time)
         else:#this branch True on initial evaluations for agents with samples from prior
-            beta_tilde = points_dict['beta']
+            beta_tilde = self.sample_from_prior_per_worker(recv_time)
             beta_rsi = self.beta
             pi_0 = np.ones((self.n,1)) * 1. / self.n
-
-            x = np.ones((self.n,1))/np.sqrt(self.n)
-            #print(np.transpose(x))
-            # XT_X = np.matmul(x,np.transpose(x)) # X^T * X
-            epsilon = self.rng.randn()*np.sqrt(self.sigma2)
-            y = np.matmul(np.transpose(x),self.beta)+epsilon
-            # XT_Y = np.matmul(x,y) # X^T * Y
-            X = np.transpose(x)
-            Y = np.concatenate((y,y),axis=1)
-
             L = self.L
-            _,U,L,_,_ = self.getPosterior(X,Y,L,recv_time)
         
         k = np.count_nonzero(self.beta)
                 
