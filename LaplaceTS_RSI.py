@@ -14,7 +14,7 @@ import copy
 from scipy.stats import invgauss
 
 
-class LaplaceTS_RSI(object):
+class LATSI(object):
 
     def __init__(self, beta, mu, theta2, sigma2, lmbd, EMitr, err, n_agents, trl):
         self.beta = beta
@@ -141,7 +141,7 @@ class LaplaceTS_RSI(object):
         
 
 
-        return beta_tilde,U,L,pi_0,beta_rsi
+        return beta_hat,U,beta_tilde,pi_0,beta_rsi
     
     def gibbs_invgauss(self,itr,XT_X,XT_Y):
         
@@ -169,7 +169,7 @@ class LaplaceTS_RSI(object):
             # gamma = points_dict['gamma']
             # B = points_dict['B']
             L = points_dict['par']
-            beta_tilde,U,L,pi_0,beta_rsi = self.getPosterior(X,Y,L,recv_time)
+            _,U,beta_tilde,pi_0,beta_rsi = self.getPosterior(X,Y,L,recv_time)
         else:#this branch True on initial evaluations for agents with samples from prior
             beta_tilde = self.sample_from_prior_per_worker(recv_time)
             beta_rsi = self.beta
