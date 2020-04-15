@@ -170,7 +170,7 @@ class SPATS(object):
         # print('X shape: ',X.shape)
         
         for i in range(0,self.n):
-            for l in range(2,self.n-i):
+            for l in range(1,self.n-i):
                 x = np.zeros((self.n,1))
                 x[i:i+l] = 1/np.sqrt(l)
                 if (qinfo.compute_posterior):
