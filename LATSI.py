@@ -241,9 +241,9 @@ class LATSI(object):
         avg_loss /= count
         avg_IG_RSI /= count
         if(avg_IG_RSI==0):
-            reward = - loss#/avg_loss
+            reward = - loss/avg_loss
         else:    
-            reward = - loss#/avg_loss + IG_RSI/avg_IG_RSI 
+            reward = - loss/avg_loss + IG_RSI/avg_IG_RSI 
         [im,lm] = np.unravel_index(reward.argmax(), reward.shape)
         bestx = np.zeros((self.n,1))
         bestx[im:im+lm] = 1/np.sqrt(lm)
