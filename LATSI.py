@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Wed Jan  8 14:35:24 2020
+Code for the following publication: 
+Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
+for Sparse Signals with Region Sensing", 
 
-@author: rghods
+2020 international conference on machine learning (ICML) (submitted)
+
+(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
+Please do not distribute. The code will become public upon acceptance of the paper.
+In this file, we are coding the class for LATSI in algorithm 3
 """
 
 import numpy as np
