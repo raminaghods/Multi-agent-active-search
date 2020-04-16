@@ -20,7 +20,7 @@ from scipy.stats import invgauss
 
 class LATSI(object):
 
-    def __init__(self, beta, mu, theta2, sigma2, lmbd, EMitr, err, n_agents, trl):
+    def __init__(self, beta, mu, theta2, sigma2, lmbd, EMitr, err, n_agents, alpha, trl):
         self.beta = beta
         self.mu = mu
         self.theta2 = theta2
@@ -39,6 +39,7 @@ class LATSI(object):
         self.trl = trl
         self.err = err
 
+        self.alpha = alpha
         # self.gamma = self.rng.rand(self.M)
         # self.B = self.rng.rand(self.L,self.L)
         # self.Sig0 = np.kron(np.diag(self.gamma),self.B)
@@ -243,7 +244,7 @@ class LATSI(object):
         if(avg_IG_RSI==0):
             reward = - loss/avg_loss
         else:    
-            reward = - loss/avg_loss + IG_RSI/avg_IG_RSI 
+            reward = - (self.alpha*(loss/avg_loss)) + IG_RSI/avg_IG_RSI 
         [im,lm] = np.unravel_index(reward.argmax(), reward.shape)
         bestx = np.zeros((self.n,1))
         bestx[im:im+lm] = 1/np.sqrt(lm)
