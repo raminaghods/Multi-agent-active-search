@@ -20,7 +20,7 @@ arXiv:1705.09236, (2017), GitHub repository: https://github.com/kirthevasank/gp-
 from argparse import Namespace
 import time
 import numpy as np
-
+import pickle as pkl
 
 # def get_option_specs(name, required=False, default=None, help_str='', **kwargs):
 # 	""" A wrapper function to get a specification as a dictionary. """
@@ -57,6 +57,8 @@ class Bayesian_optimizer(object):
 
 		self.X = None
 		self.Y = None
+		self.full_recovery_rate = []
+		self.partial_recovery_rate = []
 		self.par = None
 #		self.gamma = None 
 #		self.B = None  
@@ -174,12 +176,15 @@ class Bayesian_optimizer(object):
 		for i in range(n):
 			x = qinfos[i].val['x']
 			y = qinfos[i].val['y']
+			# self.full_recovery_rate.append(qinfos[i].val['full_recovery_rate'])
+			# self.partial_recovery_rate.append(qinfos[i].val['partial_recovery_rate'])
 			self.par = qinfos[i].val['par']
 			if 'pre-eval' in list(qinfos[i].val.keys()):
 				# assert len(y) == 1
 				# assert self.X == None
 				# print('X: ',x)
 				# print('Y: ',y)
+				self.par_init = qinfos[i].val['par']
 				for idx, xx in enumerate(y):
 					if self.X is None:
 						self.X = np.transpose(x[idx])#np.array([x[idx]])
@@ -322,6 +327,13 @@ class Bayesian_optimizer(object):
 		self._wait_for_all_free_workers()
 		# self._report_curr_results() #TODO
 		# Store additional data
+		self.beta_hats = []
+		for i in range(self.num_points):
+			beta_hat, _, _, _, self.par_init = self.options.GP.getPosterior(self.X[:(i+1)],self.Y[:(i+1)],self.par_init,(i+1))
+			self.beta_hats.append(beta_hat)
+
+		with open('observations_T128_16X16.pkl','wb') as f:
+			pkl.dump([self.X, self.Y], f)
 		self.curr_opt_val, _, _, _, _ = self.options.GP.getPosterior(self.X, self.Y, self.par, self.get_curr_spent_capital())
 		# self.history.num_jobs_per_worker = np.array(self._get_jobs_for_each_worker()) #TODO
 		# self.history.full_method_name = self.full_method_name #TODO
@@ -345,9 +357,10 @@ class Bayesian_optimizer(object):
 		  # if self.step_idx - self.last_report_at >= self.options.report_results_every:
 		  #   self._report_curr_results()
 
+
 		# Wrap up and return
 		self._optimise_wrap_up()
-		return self.curr_opt_val, self.history
+		return self.beta_hats#self.curr_opt_val, self.history, self.full_recovery_rate, self.partial_recovery_rate
 
 
 

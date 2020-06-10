@@ -16,6 +16,9 @@ import math
 import pickle as pkl
 from scipy.stats import invgauss
 
+import scipy
+import scipy.stats as ss 
+
 class SPATS(object):
 
     def __init__(self, beta, mu, theta2, sigma2, lmbd, EMitr, n_agents, trl):
@@ -115,12 +118,35 @@ class SPATS(object):
 #        #sample with Gaussian prior:
         beta_tilde = np.maximum(np.reshape(self.rng.multivariate_normal(np.squeeze(beta_hat),Sig_beta),(self.n,1)),np.zeros((self.n,1)))
 
+        # beta_tilde = np.maximum(np.reshape(self.get_multivariate_normal(np.squeeze(beta_hat),Sig_beta,self.rng),(self.n,1)),np.zeros((self.n,1)))
+    
+
         #sample with Laplace prior:
         #XT_X = np.matmul(np.transpose(X),X)
         #XT_Y = np.matmul(np.transpose(X),Y)
         #beta_tilde = np.maximum(self.gibbs_invgauss(1000+recv_time,XT_X,XT_Y),np.zeros((self.n,1)))
 
         return beta_hat,Sig0,gamma,beta_tilde,L
+
+    def get_multivariate_normal(self,mean,cov,rng):
+        # from np.dual import svd
+        mean = np.array(mean)
+        cov = np.array(cov)
+        shape = []
+        final_shape = list(shape[:])
+        final_shape.append(mean.shape[0])
+        x = rng.standard_normal(final_shape).reshape(-1, mean.shape[0])
+        cov = cov.astype(np.double)
+        # (u, s, v) = np.linalg.svd(cov, hermitian=True)
+        
+        (u, s, v) = scipy.linalg.svd(cov, lapack_driver='gesvd')
+
+        x = np.dot(x, np.sqrt(s)[:, None] * v)
+        x += mean
+        x.shape = tuple(final_shape)
+
+        return x
+
 
     def gibbs_invgauss(self,itr,XT_X,XT_Y):
         self.rng = np.random.RandomState(self.trl+itr) #itr includes recv_time, so didn't pass/use that explicitly
@@ -210,16 +236,30 @@ class SPATS(object):
         # self.rng = np.random.RandomState(recv_time)
         epsilon = self.rng.randn()*np.sqrt(self.sigma2)        
         y = np.matmul(np.transpose(bestx),self.beta)+epsilon
-        # X = np.append(X,np.transpose(bestx),axis=0)
-        # Y = np.append(Y,y,axis=0)
+
+        if qinfo.compute_posterior:
+            X = np.append(X,np.transpose(bestx),axis=0)
+            Y = np.append(Y,y,axis=0)
+        else:
+            X = np.transpose(bestx)
+            Y = y
+
+        beta_hat,_,_,_,_ = self.getPosterior(X,Y,L,recv_time)
+
+        est = (np.round(beta_hat)>(np.amax(beta_hat)/2))
+        real = (self.beta>0)
+        partial_recovery_rate_spats = np.sum(est==real)/(self.n)
+        correct_SPATS = 0.0
+        if(np.all(est==real)):
+            correct_SPATS = 1.0  
 
         if not qinfo.compute_posterior:
             #X = [np.transpose(X), bestx]#np.append(X, np.transpose(bestx),axis=0)
             #print('len X: ',len(X))
             #Y = [Y, y]#np.append(Y, y, axis=0)
-            result = {'x':[bestx], 'y':[y], 'par':L, 'pre-eval':True}
+            result = {'x':[bestx], 'y':[y], 'par':L, 'pre-eval':True, 'full_recovery_rate':correct_SPATS, 'partial_recovery_rate':partial_recovery_rate_spats}
         else:
-            result = {'x':bestx,'y':y,'par':L}
+            result = {'x':bestx,'y':y,'par':L, 'full_recovery_rate':correct_SPATS, 'partial_recovery_rate':partial_recovery_rate_spats}
             
         with open(qinfo.result_file, 'wb') as f:
             pkl.dump(result, f)

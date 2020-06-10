@@ -21,7 +21,7 @@ from scipy.stats import invgauss
 class LATSI(object):
 
     def __init__(self, beta, mu, theta2, sigma2, lmbd, EMitr, err, n_agents, alpha, trl):
-        self.beta = beta
+        self.beta = beta #true_beta
         self.mu = mu
         self.theta2 = theta2
         self.sigma2 = sigma2
@@ -259,10 +259,28 @@ class LATSI(object):
         # X = np.append(X,np.transpose(bestx),axis=0)
         # Y = np.append(Y,y,axis=0)
 
+        #update estimate, compute recovery 
+        # if qinfo.compute_posterior:
+        #     X = np.append(X,np.transpose(bestx),axis=0)
+        #     Y = np.append(Y,y,axis=0)
+        # else:
+        #     X = np.transpose(bestx)
+        #     Y = y
+
+        # beta_hat,_,_,_,_ = self.getPosterior(X,Y,L,recv_time)
+
+        # est = (np.round(beta_hat)>(np.amax(beta_hat)/2))
+        # real = (self.beta>0)
+        # partial_recovery_rate_latsi = np.sum(est==real)/(self.n)
+        # correct_LATSI = 0.0
+        # if(np.all(est==real)):
+        #     correct_LATSI = 1.0  
+
+
         if not qinfo.compute_posterior:
-            result = {'x':[bestx], 'y':[y], 'par':L, 'pre-eval':True}
+            result = {'x':[bestx], 'y':[y], 'par':L, 'pre-eval':True}#, 'full_recovery_rate':correct_LATSI, 'partial_recovery_rate':partial_recovery_rate_latsi}
         else:
-            result = {'x':bestx,'y':y,'par':L}
+            result = {'x':bestx,'y':y,'par':L}#, 'full_recovery_rate':correct_LATSI, 'partial_recovery_rate':partial_recovery_rate_latsi}
 
         with open(qinfo.result_file, 'wb') as f:
             pkl.dump(result, f)
