@@ -1,9 +1,10 @@
 '''
 Code for the following paper:
-``Decentralized Multi-Agent Active Search for Sparse Signals",
-Under Submission at UAI
 
-Please do not distribute. The code will become public upon acceptance of the paper.
+Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Decentralized Multi-Agent Active Search for Sparse Signals",
+2021 Conference On Uncertainty in Artificial Intelligence (UAI)
+
+(c) Ramina Ghods(rghods@cs.cmu.edu), Arundhati Banerjee(arundhat@andrew.cmu.edu)
 
 In this file, we are coding the RSI algorithm from reference:
 Ma, Y., Garnett, R., and Schneider, J. Active search for
