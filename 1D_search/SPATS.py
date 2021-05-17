@@ -1,10 +1,8 @@
 '''
-Code for the following publication: 
-Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
-for Sparse Signals with Region Sensing", 
-2020 international conference on machine learning (ICML) (submitted)
+Code for the following paper:
+``Decentralized Multi-Agent Active Search for Sparse Signals",
+Under Submission at UAI
 
-(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
 Please do not distribute. The code will become public upon acceptance of the paper.
 
 Code for SPATS in algorithm 2
@@ -17,7 +15,7 @@ import pickle as pkl
 from scipy.stats import invgauss
 
 import scipy
-import scipy.stats as ss 
+import scipy.stats as ss
 
 class SPATS(object):
 
@@ -78,7 +76,7 @@ class SPATS(object):
         else:
             L = 1
         M = int(self.n/L)
-        
+
         #print('L:',L)
 
         tt = len(Y)
@@ -89,7 +87,7 @@ class SPATS(object):
 #        print("gamma: ",gamma)
         B = np.eye((L))
         Sig0 = np.kron(np.diag(gamma),B)
-    
+
         for j in range(self.EMitr): # we use EM as estimator for now
             tinv = np.linalg.inv(self.sigma2*np.eye(tt)+np.matmul(np.matmul(X,Sig0),np.transpose(X)))
             F = np.matmul(np.matmul(Sig0,np.transpose(X)),tinv)
@@ -108,18 +106,18 @@ class SPATS(object):
 #       making Sig_beta positive semi definite
         min_eig = np.amin(np.real(np.linalg.eigvals(Sig_beta)))
         if min_eig < 0:
-            Sig_beta -= 10*min_eig * np.eye(*Sig_beta.shape)
+            Sig_beta -= 1.1*min_eig * np.eye(*Sig_beta.shape)
 
 #        # checks if Sig_beta is positive semi-definite:
 #        M = np.matrix(Sig_beta)
 #        print(np.all(np.linalg.eigvals(M+M.transpose()) > 0) and np.allclose(Sig_beta, np.transpose(Sig_beta), rtol=1e-4, atol=1e-4))
-            
-            
+
+
 #        #sample with Gaussian prior:
         beta_tilde = np.maximum(np.reshape(self.rng.multivariate_normal(np.squeeze(beta_hat),Sig_beta),(self.n,1)),np.zeros((self.n,1)))
 
         # beta_tilde = np.maximum(np.reshape(self.get_multivariate_normal(np.squeeze(beta_hat),Sig_beta,self.rng),(self.n,1)),np.zeros((self.n,1)))
-    
+
 
         #sample with Laplace prior:
         #XT_X = np.matmul(np.transpose(X),X)
@@ -138,7 +136,7 @@ class SPATS(object):
         x = rng.standard_normal(final_shape).reshape(-1, mean.shape[0])
         cov = cov.astype(np.double)
         # (u, s, v) = np.linalg.svd(cov, hermitian=True)
-        
+
         (u, s, v) = scipy.linalg.svd(cov, lapack_driver='gesvd')
 
         x = np.dot(x, np.sqrt(s)[:, None] * v)
@@ -156,12 +154,12 @@ class SPATS(object):
             beta = self.rng.multivariate_normal(np.squeeze(np.matmul(Sig,XT_Y)),self.sigma2*Sig)
             for j in range(self.n):
                 tauinv_vec[j] = invgauss.rvs(np.sqrt(self.sigma2)*(self.lmbd**(1/3))/np.abs(beta[j]))*(self.lmbd**(2/3))
-    
+
         return np.reshape(beta,(self.n,1))
-    
-    
+
+
     def ActiveSearch(self,points_dict,qinfo):#beta,mu,theta2,sigma2,lmbd,EMitr,T,trl=np.random.randint(1000),X,Y):
-        
+
         # rng = np.random.RandomState(trl)
         # n = beta.shape[0]
 
@@ -183,18 +181,18 @@ class SPATS(object):
         else:#this branch True on initial evaluations for agents with samples from prior
             beta_tilde = self.sample_from_prior_per_worker(recv_time) #points_dict['beta']
             L = self.L
-            
 
-        
+
+
         k = np.count_nonzero(self.beta)
-                
+
 
         max_reward = -math.inf
         bestx = np.zeros((self.n,1))
 
-        
+
         # print('X shape: ',X.shape)
-        
+
         for i in range(0,self.n):
             for l in range(1,self.n-i):
                 x = np.zeros((self.n,1))
@@ -206,7 +204,7 @@ class SPATS(object):
                     b = np.matmul(np.matmul(Sig0,np.transpose(Xt)),tmp)
                     b1 = b[:,:-1]
                     # print("shape::: ",b1.shape) #128,2
-                    b2 = np.reshape(b[:,-1],(-1,1)) 
+                    b2 = np.reshape(b[:,-1],(-1,1))
                     # print("shape:::",b2.shape) 128,1
                     xTb = np.ndarray.item(np.matmul(np.transpose(x),beta_tilde))
                     # print("shape:::",xTb.shape)
@@ -234,7 +232,7 @@ class SPATS(object):
         #%% take a new observation
         # recv_time = qinfo.send_time
         # self.rng = np.random.RandomState(recv_time)
-        epsilon = self.rng.randn()*np.sqrt(self.sigma2)        
+        epsilon = self.rng.randn()*np.sqrt(self.sigma2)
         y = np.matmul(np.transpose(bestx),self.beta)+epsilon
 
         if qinfo.compute_posterior:
@@ -251,7 +249,7 @@ class SPATS(object):
         partial_recovery_rate_spats = np.sum(est==real)/(self.n)
         correct_SPATS = 0.0
         if(np.all(est==real)):
-            correct_SPATS = 1.0  
+            correct_SPATS = 1.0
 
         if not qinfo.compute_posterior:
             #X = [np.transpose(X), bestx]#np.append(X, np.transpose(bestx),axis=0)
@@ -260,7 +258,7 @@ class SPATS(object):
             result = {'x':[bestx], 'y':[y], 'par':L, 'pre-eval':True, 'full_recovery_rate':correct_SPATS, 'partial_recovery_rate':partial_recovery_rate_spats}
         else:
             result = {'x':bestx,'y':y,'par':L, 'full_recovery_rate':correct_SPATS, 'partial_recovery_rate':partial_recovery_rate_spats}
-            
+
         with open(qinfo.result_file, 'wb') as f:
             pkl.dump(result, f)
 

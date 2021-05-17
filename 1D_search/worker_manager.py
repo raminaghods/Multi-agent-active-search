@@ -1,19 +1,21 @@
 '''
-Code for the following publication: 
-Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
-for Sparse Signals with Region Sensing", 
-2020 international conference on machine learning (ICML) (submitted)
+Code for the following paper:
+``Decentralized Multi-Agent Active Search for Sparse Signals",
+Under Submission at UAI
 
-(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
 Please do not distribute. The code will become public upon acceptance of the paper.
 
 Manager for multiple agents(workers). function used by main.py
 
 (structure is referenced from parallel Thompson Sampling by:
-Kandasamy, K., Krishnamurthy, A., Schneider, J., and
-P´oczos, B. Asynchronous parallel Bayesian optimisation
-via Thompson sampling. arXiv preprint
-arXiv:1705.09236, (2017), GitHub repository: https://github.com/kirthevasank/gp-parallel-ts)
+@inproceedings{kandasamy2018parallelised,
+  title={Parallelised bayesian optimisation via thompson sampling},
+  author={Kandasamy, Kirthevasan and Krishnamurthy, Akshay and Schneider, Jeff and P{\'o}czos, Barnab{\'a}s},
+  booktitle={International Conference on Artificial Intelligence and Statistics},
+  pages={133--142},
+  year={2018}
+GitHub repository: {https://github.com/kirthevasank/gp-parallel-ts)}
+}
 '''
 
 import os
@@ -128,7 +130,7 @@ class WorkerManager(object):
         qinfo.receive_time = self.optimiser.get_curr_spent_capital()
         qinfo.eval_time = qinfo.receive_time - qinfo.send_time
         self.latest_results.append(qinfo)
-        
+
         # Update receive time
         self.last_receive_times[worker_id] = qinfo.receive_time
         # Delete the file.
@@ -198,11 +200,11 @@ class WorkerManager(object):
     def _dispatch_evaluation(self, func_caller, point_dict, qinfo, worker_id, **kwargs):
         """ dispatches evaluation to worker_id """
         '''
-        args: 
+        args:
             point_dict : dictionary {'X' : all X's searched so far, 'Y': all Y's sensed so far}
             func_caller : the function ThompsonActiveSearch in file TS.py
             worker_id : the agent that will perform this computation
-            qinfo : 
+            qinfo :
         '''
         if self.qinfos_in_progress[worker_id] is not None:
             err_msg = 'qinfos_in_progress: %s,\nfree_workers: %s.'%(
@@ -241,6 +243,3 @@ class WorkerManager(object):
         assert (len(points['X'])%self.num_workers) == 0
         for wid in range(self.num_workers):
             self._dispatch_evaluation(func_caller, points, qinfos[wid], self.worker_ids[wid], **kwargs)
-
-
-
