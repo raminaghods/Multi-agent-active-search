@@ -1,3 +1,3 @@
 # Multi-agent-active-search
 Code for the following publication: 
-Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search", 2020 Conference on Neural Information Processing Systems (NeurIPS) (submitted)
+Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Decentralized Multi-Agent Active Search for Sparse Signals", 2021 Conference on Uncertainty in Artificial Intelligence (UAI)
