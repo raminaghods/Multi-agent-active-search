@@ -1,20 +1,21 @@
 '''
-Code for the following publication: 
-Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
-for Sparse Signals with Region Sensing", 
-2020 international conference on machine learning (ICML) (submitted)
+Code for the following paper:
+``Decentralized Multi-Agent Active Search for Sparse Signals",
+Under Submission at UAI
 
-(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
 Please do not distribute. The code will become public upon acceptance of the paper.
 
 Parallelized implementation of bayesian optimization for unknown function. function used by main.py
- 
 
 (structure is referenced from parallel Thompson Sampling by:
-Kandasamy, K., Krishnamurthy, A., Schneider, J., and
-P´oczos, B. Asynchronous parallel Bayesian optimisation
-via Thompson sampling. arXiv preprint
-arXiv:1705.09236, (2017), GitHub repository: https://github.com/kirthevasank/gp-parallel-ts)
+@inproceedings{kandasamy2018parallelised,
+  title={Parallelised bayesian optimisation via thompson sampling},
+  author={Kandasamy, Kirthevasan and Krishnamurthy, Akshay and Schneider, Jeff and P{\'o}czos, Barnab{\'a}s},
+  booktitle={International Conference on Artificial Intelligence and Statistics},
+  pages={133--142},
+  year={2018}
+GitHub repository: {https://github.com/kirthevasank/gp-parallel-ts)}
+}
 '''
 
 from argparse import Namespace
@@ -62,8 +63,8 @@ class Bayesian_optimizer(object):
 		self.full_recovery_rate = []
 		self.partial_recovery_rate = []
 		self.par = None
-#		self.gamma = None 
-#		self.B = None  
+#		self.gamma = None
+#		self.B = None
 		self.num_points = 0
 
 		self._set_up()
@@ -80,7 +81,7 @@ class Bayesian_optimizer(object):
 		# self.curr_opt_pt = None
 		# self.curr_true_opt_val = -np.inf
 		# self.curr_true_opt_pt = None
-		
+
 		# Initialise worker manager
 		self.worker_manager.set_optimiser(self)
 		copyable_params_from_worker_manager = ['num_workers']
@@ -258,7 +259,7 @@ class Bayesian_optimizer(object):
 			qinfo.compute_posterior = False
 		else:
 			qinfo.compute_posterior = True
-		
+
 		self.worker_manager.dispatch_single_evaluation(self.func_caller, point_dict, qinfo) #TODO : check this function signature - point_dict, qinfo / just point, qinfo ?
 		self._add_to_in_progress([qinfo])
 
@@ -314,7 +315,7 @@ class Bayesian_optimizer(object):
 		# next_batch_of_points = self._determine_next_batch_of_eval_points() #TODO :  push this part into TS routine
 
 		self.step_idx += self.num_workers
-		
+
 		self._dispatch_batch_of_evaluations_to_worker_manager({'X':self.X, 'Y':self.Y, 'par':self.par}, pre_eval=False)
 		# self.step_idx += self.num_workers
 		# raise NotImplementedError('synchronous not implemented yet.')
@@ -363,6 +364,3 @@ class Bayesian_optimizer(object):
 		# Wrap up and return
 		self._optimise_wrap_up()
 		return self.beta_hats#self.curr_opt_val, self.history, self.full_recovery_rate, self.partial_recovery_rate
-
-
-

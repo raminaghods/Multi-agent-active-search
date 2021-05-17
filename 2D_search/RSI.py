@@ -1,10 +1,8 @@
 '''
-Code for the following publication: 
-Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
-for Sparse Signals with Region Sensing", 
-2020 international conference on machine learning (ICML) (submitted)
+Code for the following paper:
+``Decentralized Multi-Agent Active Search for Sparse Signals",
+Under Submission at UAI
 
-(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
 Please do not distribute. The code will become public upon acceptance of the paper.
 
 In this file, we are coding the RSI algorithm from reference:
@@ -12,7 +10,8 @@ Ma, Y., Garnett, R., and Schneider, J. Active search for
 sparse signals with region sensing. In Thirty-First AAAI
 Conference on Artificial Intelligence, 2017.
 
-We use this code to compare RSI algorithm from the aforementioned reference to our proposed SPATS and LATSI algorithms.
+We use this code to compare RSI algorithm from the aforementioned reference to
+our proposed SPATS and LATSI algorithms.
 
 '''
 
@@ -106,15 +105,15 @@ class RSI(object):
                 if np.count_nonzero(beta_rsi) == 0:
                     break
                 #pi_0 /= np.sum(pi_0)
-                
+
                 idxs = [ii for ii in range(self.n) if ii not in np.nonzero(beta_hat_rsi)[0]]
                 for idx in idxs:
                     b = copy.deepcopy(beta_hat_rsi)
-                    b[idx,:] = self.mu 
+                    b[idx,:] = self.mu
                     pi_0[idx] = 1.#1./self.n
                     for t in range(i+1):
-                        pi_0[idx,:] = np.float32(pi_0[idx,:] * ss.norm(0,np.sqrt(self.sigma2)).pdf(Y[t] - np.dot(X[t],b))) 
-                
+                        pi_0[idx,:] = np.float32(pi_0[idx,:] * ss.norm(0,np.sqrt(self.sigma2)).pdf(Y[t] - np.dot(X[t],b)))
+
                 #pi_0 = np.full((self.n,1), 1./(self.n - detected))
                 pi_0[np.nonzero(beta_hat_rsi)[0],:] = 0.
                 # pi_0[idxs] = 0.
@@ -134,10 +133,10 @@ class RSI(object):
         return beta_hat_rsi, pi_0, beta_rsi,None,None
 
     def ActiveSearch(self,points_dict,qinfo):#beta,mu,theta2,sigma2,lmbd,EMitr,T,trl=np.random.randint(1000),X,Y):
-        
+
         # rng = np.random.RandomState(trl)
         # n = beta.shape[0]
-        
+
         wid =  qinfo.worker_id
         recv_time = qinfo.send_time
         if qinfo.compute_posterior:
@@ -163,16 +162,16 @@ class RSI(object):
             #X = np.transpose(x)
             #Y = y
             beta_hat_rsi = np.zeros((self.n,1))
-        
+
         k = np.count_nonzero(self.beta)
-                
+
 
         max_reward = -math.inf
         bestx = np.zeros((self.n,1))
 
         # tt = len(Y)
         # print('X shape: ',X.shape)
-        
+
         # for i in range(0,self.n):
         #     for l in range(2,self.n-i):
         # for l in range(1,self.n):
@@ -188,30 +187,30 @@ class RSI(object):
 
                 # x = np.zeros((self.n,1))
                 # x[i:i+l] = 1/np.sqrt(l)
-                
+
                         # RSI information Gain:
                         t = np.zeros((self.p, self.q))
                         t[j:(j+del_y),i:(i+del_x)] = 1
                         t = t.flatten().reshape((-1,1))
                         p_0 = np.sum(pi_0 * (1-t))
                         p_1 = np.sum(pi_0 * t)
-                        			 
+
                         #p_0 = np.sum(pi_0[0:i]) + np.sum(pi_0[i+l:self.n])
                         #p_1 = np.sum(pi_0[i:i+l])
                         lamda = self.mu * 1./np.sqrt(del_x * del_y)#np.sqrt(l)
                         IG = 0
-                        IG += -(p_0 * np.log(p_0 * ss.norm(0,1).pdf(0) + p_1 * ss.norm(0,1).pdf(-lamda)))
-                        IG += -(p_1 * np.log(p_0 * ss.norm(0,1).pdf(lamda) + p_1 * ss.norm(0,1).pdf(0)))
+                        IG += -(p_0 * np.log(p_0 * ss.norm(0,1).pdf(0) + p_1 * ss.norm(0,1).pdf(-lamda/np.sqrt(self.sigma2))))
+                        IG += -(p_1 * np.log(p_0 * ss.norm(0,1).pdf(lamda/np.sqrt(self.sigma2)) + p_1 * ss.norm(0,1).pdf(0)))
 
                         #IG_RSI = IG#RSI_IG(np.array([p_0,p_1]),mu * 1./np.sqrt(l))
                         reward = IG
-                        
+
                         if(reward>max_reward):
                             max_reward = reward
                             bestx = x
     #        print('sensing matrix:',np.transpose(bestx))
         #%% take a new observation
-        
+
         self.rng = np.random.RandomState(self.trl + recv_time)
         epsilon = self.rng.randn()*np.sqrt(self.sigma2)
         # print("RSI\\2. trial: ",self.trl," worker: ",wid,"recv_time: ",recv_time," epsilon: ",epsilon)
@@ -238,5 +237,5 @@ class RSI(object):
         # print('pi_0: ',pi_0)
         # print('beta_hat_rsi: ',beta_hat_rsi)
         # print('agent ', wid, ' returned: ',result)
-        
+
         return result

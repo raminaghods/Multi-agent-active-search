@@ -1,14 +1,12 @@
-"""
-Code for the following publication: 
-Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
-for Sparse Signals with Region Sensing", 
+'''
+Code for the following paper:
+``Decentralized Multi-Agent Active Search for Sparse Signals",
+Under Submission at UAI
 
-2020 international conference on machine learning (ICML) (submitted)
-
-(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
 Please do not distribute. The code will become public upon acceptance of the paper.
+
 In this file, we are coding the class for LATSI in algorithm 3
-"""
+'''
 
 import numpy as np
 import math
@@ -60,7 +58,7 @@ class LATSI(object):
             beta_tilde[idx] = self.rng.laplace(scale=1/self.lmbd,size=(self.n,1))
 
         return beta_tilde
-    
+
     def sample_from_prior_per_worker(self, recv_time):
 
         self.rng = np.random.RandomState(self.trl+recv_time)
@@ -85,10 +83,10 @@ class LATSI(object):
 
 #        #sample with Gaussian prior:
 #        beta_tilde = np.maximum(np.reshape(self.rng.multivariate_normal(np.squeeze(beta_hat),Sig_beta),(self.n,1)),np.zeros((self.n,1)))
-        
+
         #sample with Laplace prior:
         beta_tilde = np.maximum(self.gibbs_invgauss(1000+recv_time,XT_X,XT_Y),np.zeros((self.n,1)))
-        
+
 
         ######### posterior computation RSI #########
         pi_0 = np.ones((self.n,1)) * 1. / self.n
@@ -129,15 +127,15 @@ class LATSI(object):
                 if np.count_nonzero(beta_rsi) == 0:
                     break
                 #pi_0 /= np.sum(pi_0)
-                
+
                 idxs = [ii for ii in range(self.n) if ii not in np.nonzero(beta_hat_rsi)[0]]
                 for idx in idxs:
                     b = copy.deepcopy(beta_hat_rsi)
-                    b[idx,:] = self.mu 
+                    b[idx,:] = self.mu
                     pi_0[idx] = 1.#1./self.n
                     for t in range(i+1):
-                        pi_0[idx,:] = np.float32(pi_0[idx,:] * ss.norm(0,np.sqrt(self.sigma2)).pdf(Y[t,1] - np.dot(X[t],b))) 
-                
+                        pi_0[idx,:] = np.float32(pi_0[idx,:] * ss.norm(0,np.sqrt(self.sigma2)).pdf(Y[t,1] - np.dot(X[t],b)))
+
                 #pi_0 = np.full((self.n,1), 1./(self.n - detected))
                 pi_0[np.nonzero(beta_hat_rsi)[0],:] = 0.
                 # pi_0[idxs] = 0.
@@ -146,13 +144,13 @@ class LATSI(object):
                 print('sum:',np.sum(pi_0))
 
                 pi_0 /= np.sum(pi_0)
-        
+
 
 
         return beta_hat,U,beta_tilde,pi_0,beta_rsi
-    
+
     def gibbs_invgauss(self,itr,XT_X,XT_Y):
-        
+
         self.rng = np.random.RandomState(self.trl+itr-1000)
         tauinv_vec = 1/np.random.rand(self.n)
         for i in range(itr):
@@ -160,7 +158,7 @@ class LATSI(object):
             beta = self.get_multivariate_normal(np.squeeze(np.matmul(Sig,XT_Y)),self.sigma2*Sig,self.rng)
             for j in range(self.n):
                 tauinv_vec[j] = invgauss.rvs(np.sqrt(self.sigma2)*(self.lmbd**(1/3))/np.abs(beta[j]))*(self.lmbd**(2/3))
-    
+
         return np.reshape(beta,(self.n,1))
 
     def get_multivariate_normal(self,mean,cov,rng):
@@ -204,7 +202,7 @@ class LATSI(object):
             beta_rsi = self.beta
             pi_0 = np.ones((self.n,1)) * 1. / self.n
             L = self.L
-                        
+
 
 #        max_reward = -math.inf
         bestx = np.zeros((self.n,1))
@@ -237,7 +235,7 @@ class LATSI(object):
                             xTb = np.ndarray.item(np.matmul(np.transpose(x),beta_tilde))
                             aXTY_b = np.matmul(a,XT_Y)-beta_tilde
                             ax = np.matmul(a,x)
-                    
+
                             loss[i,del_x-1,j,del_y-1] = (np.linalg.norm(aXTY_b)**2+
                                  (self.sigma2+xTb**2)*(np.linalg.norm(ax)**2)+
                                  np.ndarray.item(2*xTb*np.matmul(np.transpose(ax),aXTY_b)))
@@ -248,39 +246,39 @@ class LATSI(object):
                             xTb = np.ndarray.item(np.matmul(np.transpose(x),beta_tilde))
                             aXTY_b = -beta_tilde
                             ax = np.matmul(a,x)
-                    
+
                             loss[i,del_x-1,j,del_y-1] = (np.linalg.norm(aXTY_b)**2+(self.sigma2+xTb**2)*(np.linalg.norm(ax)**2)+np.ndarray.item(2*xTb*np.matmul(np.transpose(ax),aXTY_b)))
-                        
+
                         t = np.zeros((self.p, self.q))
                         t[j:(j+del_y),i:(i+del_x)] = 1
                         t = t.flatten().reshape((-1,1))
                         p_0 = np.sum(pi_0 * (1-t))
-                        p_1 = np.sum(pi_0 * t)        
+                        p_1 = np.sum(pi_0 * t)
                         # RSI information Gain:
                         #p_0 = np.sum(pi_0[0:i]) + np.sum(pi_0[i+l:self.n])
                         #p_1 = np.sum(pi_0[i:i+l])
                         lamda = self.mu * 1./np.sqrt(del_x*del_y) #np.sqrt(l)
                         IG = 0
                         if(np.sum(pi_0) != 0):
-                            IG += -(p_0 * np.log(p_0 * ss.norm(0,1).pdf(0) + p_1 * ss.norm(0,1).pdf(-lamda)))
-                            IG += -(p_1 * np.log(p_0 * ss.norm(0,1).pdf(lamda) + p_1 * ss.norm(0,1).pdf(0)))
+                            IG += -(p_0 * np.log(p_0 * ss.norm(0,1).pdf(0) + p_1 * ss.norm(0,1).pdf(-lamda/np.sqrt(self.sigma2))))
+                            IG += -(p_1 * np.log(p_0 * ss.norm(0,1).pdf(lamda/np.sqrt(self.sigma2)) + p_1 * ss.norm(0,1).pdf(0)))
                         IG_RSI[i,del_x-1,j,del_y-1] = IG
-                
+
                         avg_loss += loss[i,del_x-1,j,del_y-1]
                         avg_IG_RSI += IG_RSI[i,del_x-1,j,del_y-1]
                         count += 1
-                
+
 #                if(reward>max_reward):
 #                    max_reward = reward
 #                    bestx = x
 #                    bestinv = b
-                
+
         avg_loss /= count
         avg_IG_RSI /= count
         if(avg_IG_RSI==0):
             reward = - loss/avg_loss
-        else:    
-            reward = - (self.alpha*(loss/avg_loss)) + IG_RSI/avg_IG_RSI 
+        else:
+            reward = - (self.alpha*(loss/avg_loss)) + IG_RSI/avg_IG_RSI
         [i,del_x,j,del_y] = np.unravel_index(reward.argmax(), reward.shape)
         bestx = np.zeros((self.p,self.q))#self.n,1))
         del_x += 1
@@ -294,11 +292,11 @@ class LATSI(object):
         y = np.zeros((1,2))
         y[:,0] = np.matmul(np.transpose(bestx),self.beta)+epsilon
         y[:,1] = np.matmul(np.transpose(bestx),beta_rsi)+epsilon
-        
+
         # X = np.append(X,np.transpose(bestx),axis=0)
         # Y = np.append(Y,y,axis=0)
 
-        #update estimate, compute recovery 
+        #update estimate, compute recovery
         # if qinfo.compute_posterior:
         #     X = np.append(X,np.transpose(bestx),axis=0)
         #     Y = np.append(Y,y,axis=0)
@@ -313,7 +311,7 @@ class LATSI(object):
         # partial_recovery_rate_latsi = np.sum(est==real)/(self.n)
         # correct_LATSI = 0.0
         # if(np.all(est==real)):
-        #     correct_LATSI = 1.0  
+        #     correct_LATSI = 1.0
 
 
         if not qinfo.compute_posterior:

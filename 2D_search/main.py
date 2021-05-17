@@ -1,10 +1,8 @@
 '''
-Code for the following publication: 
-Ramina Ghods, Arundhati Banerjee, Jeff Schneider, ``Asynchronous Multi Agent Active Search 
-for Sparse Signals with Region Sensing", 
-2020 international conference on machine learning (ICML) (submitted)
+Code for the following paper:
+``Decentralized Multi-Agent Active Search for Sparse Signals",
+Under Submission at UAI
 
-(c) Feb 9, 2020: Ramina Ghods (rghods@cs.cmu.edu), Arundhati Banerjee (arundhat@andrew.cmu.edu)
 Please do not distribute. The code will become public upon acceptance of the paper.
 
 main class file for asynchronous multi agent active search
@@ -16,7 +14,7 @@ from RSI import RSI
 from LATSI import LATSI
 from bayesian_optimization import Bayesian_optimizer
 from worker_manager import WorkerManager
-from argparse import Namespace 
+from argparse import Namespace
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -51,18 +49,18 @@ def trials(length, width, mu, theta2, lmbd, sigma2, EMitr, k, n, max_capital, nu
 
         est = (np.round(beta_hat)>(np.amax(beta_hat)/2))
         real = (beta>0)
-    
+
         partial_recovery_rate_spats.append(np.sum(est==real)/(n))
         correct_spats = 0.0
         if(np.all(est==real)):
-            correct_spats = 1.0  
+            correct_spats = 1.0
         full_recovery_rate_spats.append(correct_spats)
 
-    
+
 
 # #%% RSI:
     func_class2 = RSI(length, width, beta, mu, theta2, sigma2, lmbd, EMitr, err, trl)
-    
+
 
     worker_manager = WorkerManager(func_caller=func_class2, worker_ids=num_agents, poll_time=1e-15, trialnum=trl)
 
@@ -78,16 +76,16 @@ def trials(length, width, mu, theta2, lmbd, sigma2, EMitr, k, n, max_capital, nu
 
         est = (np.round(beta_hat)>(np.amax(beta_hat)/2))
         real = (beta>0)
-    
+
         partial_recovery_rate_rsi.append(np.sum(est==real)/(n))
         correct_rsi = 0.0
         if(np.all(est==real)):
-            correct_rsi = 1.0  
+            correct_rsi = 1.0
         full_recovery_rate_rsi.append(correct_rsi)
 
 # #%% LATSI:
     func_class = LATSI(length, width, beta, mu, theta2, sigma2, lmbd, EMitr, err, num_agents, alpha, trl)
-    
+
     worker_manager = WorkerManager(func_caller=func_class, worker_ids=num_agents, poll_time=1e-15, trialnum=trl)
 
     options = Namespace(max_num_steps=max_capital, num_init_evals=num_agents, num_workers=num_agents, mode=mode, GP=func_class)
@@ -102,17 +100,17 @@ def trials(length, width, mu, theta2, lmbd, sigma2, EMitr, k, n, max_capital, nu
 
         est = (np.round(beta_hat)>(np.amax(beta_hat)/2))
         real = (beta>0)
-    
+
         partial_recovery_rate_latsi.append(np.sum(est==real)/(n))
         correct_LATSI = 0.0
         if(np.all(est==real)):
-            correct_LATSI = 1.0  
+            correct_LATSI = 1.0
         full_recovery_rate_latsi.append(correct_LATSI)
-    
-    
-    
+
+
+
     return [full_recovery_rate_spats, full_recovery_rate_rsi, full_recovery_rate_latsi, partial_recovery_rate_spats,partial_recovery_rate_rsi, partial_recovery_rate_latsi]
-    
+
 
 
 if __name__ == "__main__":
@@ -122,10 +120,10 @@ if __name__ == "__main__":
       - num_agents:
       - max_capital: The maximum capital for optimisation.
       - options: A namespace which gives other options.
-     
+
       - #true_opt_pt, true_opt_val: The true optimum point and value (if known). Mostly for
           experimenting with synthetic problems.
-      
+
     Returns: (gpb_opt_pt, gpb_opt_val, history)
       - gpb_opt_pt, gpb_opt_val: The optimum point and value.
       - history: A namespace which contains a history of all the previous queries.
@@ -146,17 +144,17 @@ if __name__ == "__main__":
     T = 128 # number of measurements T
     err = 0.5 # hyperparameter for RSI algorithm
     alpha = 1 # hyper parameter for LATSI algorithm
-    
+
     num_agents = np.array([1,2,4,8]) # list on number of agents
     mode = 'asy' #alternatively 'syn' defines synchronous vs. asynchronous parallelisation. we focus on 'asy' in this paper
 
     full_recovery_rate = np.zeros((num_agents.shape[0], T, num_trials,3)) # percentage of results where we fully recover a vector beta
     partial_recovery_rate = np.zeros((num_agents.shape[0], T, num_trials,3))  # percentage of estimating correct entries
 
-    
+
     for k in k_arr:
         aid = 0
-        
+
         for agents in num_agents:
             print('agents: %d T=%d'%(agents,T))
             schftseed = T * (num_trials+1)
@@ -166,21 +164,21 @@ if __name__ == "__main__":
             full_recovery_rate[aid,:,:,0] = np.stack(res[:,0]).T#SPATS
             full_recovery_rate[aid,:,:,1] = np.stack(res[:,1]).T#RSI
             full_recovery_rate[aid,:,:,2] = np.stack(res[:,2]).T#LATSI
-            
+
             partial_recovery_rate[aid,:,:,0] = np.stack(res[:,3]).T#SPATS
             partial_recovery_rate[aid,:,:,1] = np.stack(res[:,4]).T#RSI
             partial_recovery_rate[aid,:,:,2] = np.stack(res[:,5]).T#LATSI
-            
+
             aid += 1
         # print('recovery ',full_recovery_rate[:,:,:,0])
         savepath = 'results/'
         filename = 'results.pkl'
-        
+
         with open(os.path.join(savepath,filename),'wb') as f:
             pickle.dump([T,full_recovery_rate,partial_recovery_rate],f)
 
         print('saved!')
-      
+
         LATSI_recovery = np.zeros((num_agents.shape[0], T, num_trials, 2))
         SPATS_recovery = np.zeros((num_agents.shape[0], T, num_trials, 2))
         RSI_recovery = np.zeros((num_agents.shape[0], T, num_trials, 2))
@@ -231,7 +229,7 @@ if __name__ == "__main__":
             plt.fill_between(np.arange(T), np.mean(LATSI_recovery[aid,:,:,0],axis=1)+f_std_err_LATSI[aid,:], np.mean(LATSI_recovery[aid,:,:,0],axis=1)-f_std_err_LATSI[aid,:], color=next(LATSIfillcolor), alpha=0.5)
             plt.fill_between(np.arange(T), np.mean(SPATS_recovery[aid,:,:,0],axis=1)+f_std_err_SPATS[aid,:], np.mean(SPATS_recovery[aid,:,:,0],axis=1)-f_std_err_SPATS[aid,:], color=next(SPATSfillcolor), alpha=0.5)
             plt.fill_between(np.arange(T), np.mean(RSI_recovery[aid,:,:,0],axis=1)+f_std_err_RSI[aid,:], np.mean(RSI_recovery[aid,:,:,0],axis=1)-f_std_err_RSI[aid,:], color=next(RSIfillcolor), alpha=0.5)
-            
+
         plt.legend()
         plt.xlabel("number of measurements (T)",fontsize = 18)
         plt.ylabel("full recovery rate",fontsize = 18)
@@ -268,4 +266,3 @@ if __name__ == "__main__":
         plt.title("k=%d"%k, fontsize=18)
         plt.savefig('results/Tbyagents_full_recovery_agents_%s_k_%d_n_%d_trials_%d.pdf'%(str(num_agents),k,n,num_trials))
         plt.show()
-
